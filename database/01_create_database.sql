@@ -3,8 +3,8 @@
 -------------CREACIÓN BASE DE DATOS HOTEL------------------
 -----------------------------------------------------------
 
-CREATE DATABASE bd_hotel_grupoAA;
+CREATE DATABASE bd_hotel_grupoAC;
 GO
 
-USE bd_hotel_grupoAA;
+USE bd_hotel_grupoAC;
 GO

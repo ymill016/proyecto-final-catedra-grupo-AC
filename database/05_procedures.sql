@@ -1,12 +1,12 @@
-USE bd_hotel_grupoAA;
+USE bd_hotel_grupoAC;
 GO
 
 /* ============================================================
-   FUNCIONES ESCALARES
-============================================================ */
+   FUNCIONES
+   ============================================================ */
 
 /* Función 1: Calcular noches de estancia */
-CREATE OR ALTER FUNCTION fn_calcular_noches(@p_id_estancia INT)
+CREATE OR ALTER FUNCTION finanzas.fn_calcular_noches(@p_id_estancia INT)
 RETURNS INT
 AS
 BEGIN
@@ -17,7 +17,7 @@ BEGIN
     SELECT
         @v_checkin = fecha_checkin,
         @v_checkout = fecha_checkout
-    FROM estancia
+    FROM operaciones.estancia
     WHERE id_estancia = @p_id_estancia;
 
     IF @@ROWCOUNT = 0
@@ -36,14 +36,14 @@ END;
 GO
 
 /* Función 2: Total consumos */
-CREATE OR ALTER FUNCTION fn_calcular_total_servicios(@p_id_estancia INT)
+CREATE OR ALTER FUNCTION finanzas.fn_calcular_total_servicios(@p_id_estancia INT)
 RETURNS NUMERIC(10,2)
 AS
 BEGIN
     DECLARE @v_total NUMERIC(10,2);
 
     SELECT @v_total = COALESCE(SUM(subtotal),0)
-    FROM consumo_servicio
+    FROM operaciones.consumo_servicio
     WHERE id_estancia = @p_id_estancia;
 
     RETURN @v_total;
@@ -51,7 +51,7 @@ END;
 GO
 
 /* Función 3: Disponibilidad de habitación */
-CREATE OR ALTER FUNCTION fn_habitacion_disponible(
+CREATE OR ALTER FUNCTION operaciones.fn_habitacion_disponible(
     @p_id_habitacion INT,
     @p_fecha_entrada DATETIME2,
     @p_fecha_salida DATETIME2
@@ -66,7 +66,7 @@ BEGIN
         RETURN 0;
 
     SELECT @v_estado_habitacion = estado_habitacion
-    FROM habitacion
+    FROM catalogo.habitacion
     WHERE id_habitacion = @p_id_habitacion;
 
     IF @@ROWCOUNT = 0
@@ -76,7 +76,7 @@ BEGIN
         RETURN 0;
 
     SELECT @v_conflictos = COUNT(*)
-    FROM estancia e
+    FROM operaciones.estancia e
     WHERE e.id_habitacion = @p_id_habitacion
       AND e.estado_estancia = 'ACTIVA'
       AND e.fecha_checkin < @p_fecha_salida
@@ -90,7 +90,7 @@ END;
 GO
 
 /* Función 4: Costo total hospedaje */
-CREATE OR ALTER FUNCTION fn_calcular_costo_habitacion(@p_id_estancia INT)
+CREATE OR ALTER FUNCTION finanzas.fn_calcular_costo_habitacion(@p_id_estancia INT)
 RETURNS NUMERIC(10,2)
 AS
 BEGIN
@@ -98,16 +98,16 @@ BEGIN
     DECLARE @v_precio_noche NUMERIC(10,2);
     DECLARE @v_costo_total NUMERIC(10,2);
 
-    SET @v_noches = dbo.fn_calcular_noches(@p_id_estancia);
+    SET @v_noches = finanzas.fn_calcular_noches(@p_id_estancia);
 
     IF @v_noches IS NULL
         RETURN NULL;
 
     SELECT @v_precio_noche = th.precio_noche
-    FROM estancia e
-    JOIN habitacion h
+    FROM operaciones.estancia e
+    JOIN catalogo.habitacion h
         ON h.id_habitacion = e.id_habitacion
-    JOIN tipo_habitacion th
+    JOIN catalogo.tipo_habitacion th
         ON th.id_tipo_habitacion = h.id_tipo_habitacion
     WHERE e.id_estancia = @p_id_estancia;
 
@@ -122,10 +122,10 @@ GO
 
 /* ============================================================
    PROCEDIMIENTOS ALMACENADOS
-============================================================ */
+   ============================================================ */
 
 /* Procedimiento 1: Check-in */
-CREATE OR ALTER PROCEDURE sp_realizar_checkin
+CREATE OR ALTER PROCEDURE operaciones.sp_realizar_checkin
     @p_id_reservacion INT,
     @p_id_habitacion INT,
     @p_id_empleado INT,
@@ -141,7 +141,7 @@ BEGIN
     SELECT
         @v_estado_reserva = estado_reserva,
         @v_id_huesped = id_huesped
-    FROM reservacion
+    FROM operaciones.reservacion
     WHERE id_reservacion = @p_id_reservacion;
 
     IF @@ROWCOUNT = 0
@@ -156,7 +156,7 @@ BEGIN
     END;
 
     SELECT @v_estado_habitacion = estado_habitacion
-    FROM habitacion
+    FROM catalogo.habitacion
     WHERE id_habitacion = @p_id_habitacion;
 
     IF @@ROWCOUNT = 0
@@ -170,7 +170,7 @@ BEGIN
         RETURN;
     END;
 
-    INSERT INTO estancia(
+    INSERT INTO operaciones.estancia(
         fecha_checkin,
         fecha_checkout,
         estado_estancia,
@@ -189,7 +189,7 @@ BEGIN
 
     SET @p_id_estancia_out = SCOPE_IDENTITY();
 
-    INSERT INTO acompanante(
+    INSERT INTO operaciones.acompanante(
         es_titular,
         id_estancia,
         id_huesped
@@ -200,14 +200,14 @@ BEGIN
         @v_id_huesped
     );
 
-    UPDATE habitacion
+    UPDATE catalogo.habitacion
     SET estado_habitacion = 'OCUPADA'
     WHERE id_habitacion = @p_id_habitacion;
 END;
 GO
 
-/* Procedimiento 2: Check-out */
-CREATE OR ALTER PROCEDURE sp_realizar_checkout
+/* Procedimiento 2: Check-out*/
+CREATE OR ALTER PROCEDURE finanzas.sp_realizar_checkout
     @p_id_estancia INT,
     @p_id_empleado INT,
     @p_tipo_pago VARCHAR(30),
@@ -234,7 +234,7 @@ BEGIN
     SELECT
         @v_estado_estancia = estado_estancia,
         @v_id_habitacion = id_habitacion
-    FROM estancia
+    FROM operaciones.estancia
     WHERE id_estancia = @p_id_estancia;
 
     IF @@ROWCOUNT = 0
@@ -248,7 +248,7 @@ BEGIN
 
     IF EXISTS (
         SELECT 1
-        FROM factura
+        FROM finanzas.factura
         WHERE id_estancia = @p_id_estancia
     )
     BEGIN
@@ -256,27 +256,27 @@ BEGIN
         RETURN;
     END;
 
-    UPDATE estancia
+    UPDATE operaciones.estancia
     SET fecha_checkout = GETDATE(),
         estado_estancia = 'FINALIZADA'
     WHERE id_estancia = @p_id_estancia;
 
     SET @v_costo_habitacion =
-        dbo.fn_calcular_costo_habitacion(@p_id_estancia);
+        finanzas.fn_calcular_costo_habitacion(@p_id_estancia);
 
     SET @v_noches =
-        dbo.fn_calcular_noches(@p_id_estancia);
+        finanzas.fn_calcular_noches(@p_id_estancia);
 
     SET @v_total_servicios =
-        dbo.fn_calcular_total_servicios(@p_id_estancia);
+        finanzas.fn_calcular_total_servicios(@p_id_estancia);
 
     SELECT
         @v_precio_noche = th.precio_noche,
         @v_nombre_habitacion = th.nombre_tipo
-    FROM estancia e
-    JOIN habitacion h
+    FROM operaciones.estancia e
+    JOIN catalogo.habitacion h
         ON h.id_habitacion = e.id_habitacion
-    JOIN tipo_habitacion th
+    JOIN catalogo.tipo_habitacion th
         ON th.id_tipo_habitacion = h.id_tipo_habitacion
     WHERE e.id_estancia = @p_id_estancia;
 
@@ -285,7 +285,7 @@ BEGIN
     SET @v_impuestos = ROUND(@v_subtotal * @v_tasa_impuesto,2);
     SET @v_total = @v_subtotal + @v_impuestos;
 
-    INSERT INTO factura(
+    INSERT INTO finanzas.factura(
         fecha_emision,
         subtotal,
         impuestos,
@@ -318,7 +318,7 @@ BEGIN
 
     SET @p_id_factura_out = SCOPE_IDENTITY();
 
-    INSERT INTO detalle_factura(
+    INSERT INTO finanzas.detalle_factura(
         tipo_detalle,
         concepto,
         cantidad,
@@ -338,7 +338,7 @@ BEGIN
         NULL
     );
 
-    INSERT INTO detalle_factura(
+    INSERT INTO finanzas.detalle_factura(
         tipo_detalle,
         concepto,
         cantidad,
@@ -355,15 +355,15 @@ BEGIN
         cs.subtotal,
         @p_id_factura_out,
         cs.id_consumo
-    FROM consumo_servicio cs
-    JOIN servicio s
+    FROM operaciones.consumo_servicio cs
+    JOIN catalogo.servicio s
         ON s.id_servicio = cs.id_servicio
     WHERE cs.id_estancia = @p_id_estancia;
 END;
 GO
 
 /* Procedimiento 3: Registrar consumo */
-CREATE OR ALTER PROCEDURE sp_registrar_consumo_servicio
+CREATE OR ALTER PROCEDURE operaciones.sp_registrar_consumo_servicio
     @p_id_estancia INT,
     @p_id_servicio INT,
     @p_id_empleado INT,
@@ -384,7 +384,7 @@ BEGIN
     END;
 
     SELECT @v_estado_estancia = estado_estancia
-    FROM estancia
+    FROM operaciones.estancia
     WHERE id_estancia = @p_id_estancia;
 
     IF @@ROWCOUNT = 0
@@ -399,7 +399,7 @@ BEGIN
     SELECT
         @v_precio_unitario = precio_unitario,
         @v_estado_servicio = estado_servicio
-    FROM servicio
+    FROM catalogo.servicio
     WHERE id_servicio = @p_id_servicio;
 
     IF @@ROWCOUNT = 0
@@ -413,7 +413,7 @@ BEGIN
 
     SET @v_subtotal = @p_cantidad * @v_precio_unitario;
 
-    INSERT INTO consumo_servicio(
+    INSERT INTO operaciones.consumo_servicio(
         fecha_consumo,
         cantidad,
         subtotal,

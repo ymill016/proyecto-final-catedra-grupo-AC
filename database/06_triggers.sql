@@ -15,7 +15,7 @@ BEGIN
     IF EXISTS (
         SELECT 1
         FROM inserted
-        WHERE estado_reserva NOT IN ('PENDIENTE', 'CONFIRMADA')
+        WHERE estado_reserva NOT IN ('PENDIENTE', 'CONFIRMADA', 'CANCELADA')
            OR fecha_salida <= fecha_entrada
     )
     BEGIN

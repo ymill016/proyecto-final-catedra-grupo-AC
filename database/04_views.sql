@@ -57,3 +57,24 @@ FROM operaciones.huesped
 WHERE nacionalidad IS NOT NULL
 GROUP BY nacionalidad;
 GO
+
+-- LAS MISMAS 3 CONSULTAS PARA SSMS Y POWER BI.
+   
+-- 1. CTE + RANK: tipos de habitacion
+SELECT nombre_tipo, total_reservas, posicion
+FROM operaciones.vw_tipos_habitacion_mas_reservados
+ORDER BY posicion, nombre_tipo;
+GO
+
+-- 2. PIVOT + ROW_NUMBER: estados por canal
+SELECT canal_reserva, pendientes, confirmadas, canceladas, posicion
+FROM operaciones.vw_reservas_por_canal_estado
+ORDER BY posicion;
+GO
+
+-- 3. DENSE_RANK: huespedes por nacionalidad
+SELECT nacionalidad, total_huespedes, posicion
+FROM operaciones.vw_huespedes_por_nacionalidad
+ORDER BY posicion, nacionalidad;
+GO
+

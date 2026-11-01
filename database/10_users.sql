@@ -39,10 +39,57 @@ FROM sys.databases
 WHERE name = 'bd_hotel_grupoAC';
 GO
 
--- Probar los permisos (ejecutar de uno en uno)
 
--- Prueba del profesor (solo lectura)
--- EXECUTE AS USER = 'james';
--- SELECT TOP 5 * FROM operaciones.huesped;        -- Funciona
--- DELETE FROM operaciones.huesped WHERE 1 = 0;    -- Permiso denegado
--- REVERT;
+  
+-- Probar los permisos 
+
+USE bd_hotel_grupoAC;
+GO
+
+-- ==================================
+-- 1. PROFESOR (james)
+-- ==================================
+
+EXECUTE AS USER = 'james';
+
+SELECT * FROM operaciones.huesped;  -- Permitido
+
+DELETE FROM operaciones.huesped
+WHERE id_huesped = -1;              -- Denegado
+
+REVERT;
+GO
+
+
+-- ==================================
+-- 2. RECEPCIONISTA (ana)
+-- ==================================
+
+EXECUTE AS USER = 'ana';
+
+SELECT * FROM operaciones.reservacion; -- Permitido
+
+UPDATE operaciones.reservacion
+SET estado_reserva = 'CONFIRMADA'
+WHERE id_reservacion = -1;             -- Permitido
+
+SELECT * FROM finanzas.factura;        -- Denegado
+
+REVERT;
+GO
+
+
+-- ==================================
+-- 3. PROGRAMADOR (carlos)
+-- ==================================
+
+EXECUTE AS USER = 'carlos';
+
+SELECT * FROM operaciones.huesped;     -- Permitido
+
+UPDATE operaciones.reservacion
+SET estado_reserva = 'CONFIRMADA'
+WHERE id_reservacion = -1;             -- Permitido
+
+REVERT;
+GO

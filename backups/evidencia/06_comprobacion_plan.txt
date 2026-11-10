@@ -1,0 +1,36 @@
+-- 2026-11-10 16:56:52 :: comprobar_plan.sql
+Changed database context to 'msdb'.
+== 1. Jobs, horario y ultimo resultado ==
+job|estado|calendario|ultimo_resultado|ultima_ejecucion
+---|------|----------|----------------|----------------
+AC_Backup_DIFF|Deshabilitado|AC_DIFF_lunes_sabado_0200|Correcto|2026-11-10 22:53:07.000
+AC_Backup_FULL|Deshabilitado|AC_FULL_domingo_0200|Correcto|2026-11-10 22:53:02.000
+AC_Backup_LOG|Deshabilitado|AC_LOG_cada_30_min|Correcto|2026-11-10 22:53:10.000
+== 2. Cadena de respaldos (cada LOG debe empezar donde termino el anterior) ==
+tipo|inicio|con_checksum|cadena|archivo
+----|------|------------|------|-------
+FULL|2026-11-10 22:52:06.000|1|OK (inicio de cadena)|/var/opt/mssql/data/bd_hotel_grupoAC_FULL_20261110_225207.bak
+DIFF|2026-11-10 22:52:07.000|1|OK (su FULL existe)|/var/opt/mssql/data/bd_hotel_grupoAC_DIFF_20261110_225208.bak
+LOG|2026-11-10 22:52:08.000|1|OK (primer log)|/var/opt/mssql/data/bd_hotel_grupoAC_LOG_20261110_225208.trn
+FULL|2026-11-10 22:53:02.000|1|OK (inicio de cadena)|/var/opt/mssql/data/bd_hotel_grupoAC_FULL_20261110_225303.bak
+DIFF|2026-11-10 22:53:07.000|1|OK (su FULL existe)|/var/opt/mssql/data/bd_hotel_grupoAC_DIFF_20261110_225307.bak
+LOG|2026-11-10 22:53:11.000|1|OK (continua)|/var/opt/mssql/data/bd_hotel_grupoAC_LOG_20261110_225311.trn
+== 3. Lectura de los ultimos archivos FULL, DIFF y LOG ==
+Verificando (D): /var/opt/mssql/data/bd_hotel_grupoAC_FULL_20261110_225303.bak
+The backup set on file 1 is valid.
+Verificando (I): /var/opt/mssql/data/bd_hotel_grupoAC_DIFF_20261110_225307.bak
+The backup set on file 1 is valid.
+Verificando (L): /var/opt/mssql/data/bd_hotel_grupoAC_LOG_20261110_225311.trn
+The backup set on file 1 is valid.
+== 4. Base restaurada: integridad y datos ==
+DBCC CHECKDB sin errores en bd_hotel_grupoAC_prueba.
+base|reservas|huespedes
+----|--------|---------
+original|111|110
+restaurada|111|110
+id|etapa|fecha
+--|-----|-----
+1|Antes del Full|2026-11-10 22:52:06.5756013
+2|Antes del diferencial|2026-11-10 22:52:07.4548760
+3|Antes del log|2026-11-10 22:52:08.1440161
+exit=0

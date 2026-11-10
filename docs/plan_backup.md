@@ -56,6 +56,7 @@ Sin diferenciales serían hasta 7 días de logs, unos 336 archivos, y el RTO cor
 | Creación y ejecución de los jobs | Los 3 jobs creados con su calendario y ejecutados con `sp_start_job` | `03_creacion_y_ejecucion_jobs.txt` |
 | Historial de SQL Agent y `msdb` | `AC_Backup_FULL`, `AC_Backup_DIFF` y `AC_Backup_LOG` en estado **Correcto**; 6 respaldos registrados en `msdb.dbo.backupset`, todos con checksum | `04_verificacion_jobs_y_msdb.txt` |
 | Estado final | Los 3 jobs quedaron **deshabilitados**, no borrados, para no llenar el disco del equipo de pruebas | `05_jobs_deshabilitados.txt` |
+| Comprobación independiente (`backups/comprobar_plan.sql`, solo lectura) | Cadena de LSN sin huecos; últimos Full, diferencial y log legibles; `DBCC CHECKDB` sin errores en la base restaurada | `06_comprobacion_plan.txt` |
 
 La tabla `dbo.demo_backup_AC` registra una fila antes de cada respaldo: "Antes del Full", "Antes del diferencial" y "Antes del log". Que las tres aparezcan en la base restaurada demuestra que se aplicó la cadena completa.
 

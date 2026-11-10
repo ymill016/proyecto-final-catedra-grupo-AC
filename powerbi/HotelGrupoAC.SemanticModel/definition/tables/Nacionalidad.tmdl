@@ -1,0 +1,55 @@
+table Nacionalidad
+	lineageTag: 86047f81-fc47-5a3c-8464-bffb4c682dd4
+
+	measure Huespedes = SUM(Nacionalidad[total_huespedes])
+		formatString: #,0
+		lineageTag: ca66c8c9-11e3-52d7-b108-f597e17ef7dc
+
+	measure Nacionalidades = DISTINCTCOUNT(Nacionalidad[nacionalidad])
+		formatString: #,0
+		lineageTag: 64bb4a20-213e-5fc1-aa59-ea6dcd76c817
+
+	measure 'Narrativa Nacionalidades' = ```
+			VAR Maximo = MAXX(VALUES(Nacionalidad[nacionalidad]), [Huespedes])
+			VAR Lideres = CONCATENATEX(FILTER(VALUES(Nacionalidad[nacionalidad]), [Huespedes] = Maximo), Nacionalidad[nacionalidad], ", ")
+			RETURN Lideres & " aporta " & FORMAT(DIVIDE(Maximo, [Huespedes]), "0.0%") & " de los huéspedes (" & Maximo & " de " & [Huespedes] & ")."
+			```
+		lineageTag: 5810ea90-db4e-5906-afea-8672121cf2b5
+
+	column nacionalidad
+		dataType: string
+		lineageTag: fa6f7dd0-e682-5ed9-bfff-4fde1748aedf
+		summarizeBy: none
+		sourceColumn: nacionalidad
+
+		annotation SummarizationSetBy = User
+
+	column total_huespedes
+		dataType: int64
+		formatString: 0
+		lineageTag: 153521fb-2c45-5ca0-908d-3ab9f59b4f79
+		summarizeBy: none
+		sourceColumn: total_huespedes
+
+		annotation SummarizationSetBy = User
+
+	column posicion
+		dataType: int64
+		formatString: 0
+		lineageTag: c233efda-b42f-55de-b04b-34d434b586c4
+		summarizeBy: none
+		sourceColumn: posicion
+
+		annotation SummarizationSetBy = User
+
+	partition Nacionalidad = m
+		mode: import
+		source =
+				let
+				    Origen = Sql.Database(ServidorSQL, BaseDatos),
+				    Vista = Origen{[Schema="operaciones",Item="vw_huespedes_por_nacionalidad"]}[Data]
+				in
+				    Vista
+
+	annotation PBI_ResultType = Table
+

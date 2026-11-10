@@ -1,0 +1,75 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
+  "name": "94a6698b9aab5ccebdce",
+  "position": {
+    "x": 856,
+    "y": 156,
+    "z": 900,
+    "width": 408,
+    "height": 56,
+    "tabOrder": 900
+  },
+  "visual": {
+    "visualType": "slicer",
+    "drillFilterOtherVisuals": true,
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Nacionalidad"
+                    }
+                  },
+                  "Property": "nacionalidad"
+                }
+              },
+              "queryRef": "Nacionalidad.nacionalidad",
+              "nativeQueryRef": "nacionalidad"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "data": [
+        {
+          "properties": {
+            "mode": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Dropdown'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Nacionalidad'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

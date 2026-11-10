@@ -1,0 +1,139 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
+  "name": "68cdfd1056da5b57a4e5",
+  "position": {
+    "x": 436,
+    "y": 218,
+    "z": 1100,
+    "width": 408,
+    "height": 336,
+    "tabOrder": 1100
+  },
+  "visual": {
+    "visualType": "columnChart",
+    "drillFilterOtherVisuals": true,
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CanalEstado"
+                    }
+                  },
+                  "Property": "canal_reserva"
+                }
+              },
+              "queryRef": "CanalEstado.canal_reserva",
+              "nativeQueryRef": "canal_reserva"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CanalEstado"
+                    }
+                  },
+                  "Property": "Confirmadas"
+                }
+              },
+              "queryRef": "CanalEstado.Confirmadas",
+              "nativeQueryRef": "Confirmadas"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CanalEstado"
+                    }
+                  },
+                  "Property": "Pendientes"
+                }
+              },
+              "queryRef": "CanalEstado.Pendientes",
+              "nativeQueryRef": "Pendientes"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CanalEstado"
+                    }
+                  },
+                  "Property": "Canceladas"
+                }
+              },
+              "queryRef": "CanalEstado.Canceladas",
+              "nativeQueryRef": "Canceladas"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "CanalEstado"
+                  }
+                },
+                "Property": "Confirmadas"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": false
+      }
+    },
+    "objects": {
+      "labels": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Consulta 2 · Reservas por canal y estado'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

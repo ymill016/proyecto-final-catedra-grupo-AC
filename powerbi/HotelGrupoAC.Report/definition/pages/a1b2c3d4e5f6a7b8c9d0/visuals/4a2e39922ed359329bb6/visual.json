@@ -1,0 +1,111 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
+  "name": "4a2e39922ed359329bb6",
+  "position": {
+    "x": 16,
+    "y": 218,
+    "z": 1000,
+    "width": 408,
+    "height": 336,
+    "tabOrder": 1000
+  },
+  "visual": {
+    "visualType": "clusteredBarChart",
+    "drillFilterOtherVisuals": true,
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "TipoHabitacion"
+                    }
+                  },
+                  "Property": "nombre_tipo"
+                }
+              },
+              "queryRef": "TipoHabitacion.nombre_tipo",
+              "nativeQueryRef": "nombre_tipo"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "TipoHabitacion"
+                    }
+                  },
+                  "Property": "Reservas Totales"
+                }
+              },
+              "queryRef": "TipoHabitacion.Reservas Totales",
+              "nativeQueryRef": "Reservas Totales"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "TipoHabitacion"
+                  }
+                },
+                "Property": "Reservas Totales"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": false
+      }
+    },
+    "objects": {
+      "labels": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Consulta 1 · Tipos de habitación más solicitados'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

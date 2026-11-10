@@ -1,0 +1,51 @@
+table TipoHabitacion
+	lineageTag: 9edcebb7-cbe4-5733-8868-1fc99ccee47b
+
+	measure 'Reservas Totales' = SUM(TipoHabitacion[total_reservas])
+		formatString: #,0
+		lineageTag: 7ebc63f1-3447-5b94-9cb4-d6d2c0e9d47c
+
+	measure 'Narrativa Tipos' = ```
+			VAR Maximo = MAXX(VALUES(TipoHabitacion[nombre_tipo]), [Reservas Totales])
+			VAR Lideres = CONCATENATEX(FILTER(VALUES(TipoHabitacion[nombre_tipo]), [Reservas Totales] = Maximo), TipoHabitacion[nombre_tipo], ", ")
+			RETURN "Más solicitada: " & Lideres & " con " & Maximo & " reservas (" & FORMAT(DIVIDE(Maximo, [Reservas Totales]), "0.0%") & " del total)."
+			```
+		lineageTag: 6cf35760-8e1b-5909-980c-6afc18dddaaa
+
+	column nombre_tipo
+		dataType: string
+		lineageTag: a44a94b9-f24c-5b25-84e2-7b31078db153
+		summarizeBy: none
+		sourceColumn: nombre_tipo
+
+		annotation SummarizationSetBy = User
+
+	column total_reservas
+		dataType: int64
+		formatString: 0
+		lineageTag: 47087c66-747d-5f00-ab6b-429e9853fad2
+		summarizeBy: none
+		sourceColumn: total_reservas
+
+		annotation SummarizationSetBy = User
+
+	column posicion
+		dataType: int64
+		formatString: 0
+		lineageTag: 0721bd34-14b7-5a5e-b4af-a72e6fdd150c
+		summarizeBy: none
+		sourceColumn: posicion
+
+		annotation SummarizationSetBy = User
+
+	partition TipoHabitacion = m
+		mode: import
+		source =
+				let
+				    Origen = Sql.Database(ServidorSQL, BaseDatos),
+				    Vista = Origen{[Schema="operaciones",Item="vw_tipos_habitacion_mas_reservados"]}[Data]
+				in
+				    Vista
+
+	annotation PBI_ResultType = Table
+

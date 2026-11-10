@@ -1,0 +1,106 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
+  "name": "332857118d42531e8750",
+  "position": {
+    "x": 856,
+    "y": 218,
+    "z": 1200,
+    "width": 408,
+    "height": 336,
+    "tabOrder": 1200
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "drillFilterOtherVisuals": true,
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Nacionalidad"
+                    }
+                  },
+                  "Property": "posicion"
+                }
+              },
+              "queryRef": "Nacionalidad.posicion",
+              "nativeQueryRef": "posicion"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Nacionalidad"
+                    }
+                  },
+                  "Property": "nacionalidad"
+                }
+              },
+              "queryRef": "Nacionalidad.nacionalidad",
+              "nativeQueryRef": "nacionalidad"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Nacionalidad"
+                    }
+                  },
+                  "Property": "Huespedes"
+                }
+              },
+              "queryRef": "Nacionalidad.Huespedes",
+              "nativeQueryRef": "Huespedes"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Nacionalidad"
+                  }
+                },
+                "Property": "posicion"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": false
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Consulta 3 · Ranking de nacionalidades'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

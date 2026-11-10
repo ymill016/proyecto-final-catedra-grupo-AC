@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
+  "name": "25b6c11ad9a3527f9249",
+  "position": {
+    "x": 516,
+    "y": 56,
+    "z": 400,
+    "width": 248,
+    "height": 92,
+    "tabOrder": 400
+  },
+  "visual": {
+    "visualType": "card",
+    "drillFilterOtherVisuals": true,
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CanalEstado"
+                    }
+                  },
+                  "Property": "Tasa Cancelacion"
+                }
+              },
+              "queryRef": "CanalEstado.Tasa Cancelacion",
+              "nativeQueryRef": "Tasa Cancelacion"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Tasa de cancelación'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

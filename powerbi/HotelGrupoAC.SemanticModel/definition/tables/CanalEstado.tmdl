@@ -1,0 +1,89 @@
+table CanalEstado
+	lineageTag: 41b01352-7737-508d-9c21-c22566d7bb63
+
+	measure Confirmadas = SUM(CanalEstado[confirmadas])
+		formatString: #,0
+		lineageTag: cf6fcb80-624f-5785-8bbb-5572defcb640
+
+	measure Pendientes = SUM(CanalEstado[pendientes])
+		formatString: #,0
+		lineageTag: 6303a5b1-d8fa-5be2-9cd8-531f8dbe06d0
+
+	measure Canceladas = SUM(CanalEstado[canceladas])
+		formatString: #,0
+		lineageTag: 77c249fa-e544-55e6-af52-8afea809948e
+
+	measure 'Reservas Canal' = [Confirmadas] + [Pendientes] + [Canceladas]
+		formatString: #,0
+		lineageTag: 177f3562-df82-51a4-b26f-57e013b97140
+
+	measure 'Tasa Confirmacion' = DIVIDE([Confirmadas], [Reservas Canal])
+		formatString: 0.0%
+		lineageTag: 105b3966-9f3a-5850-a49a-88b744469806
+
+	measure 'Tasa Cancelacion' = DIVIDE([Canceladas], [Reservas Canal])
+		formatString: 0.0%
+		lineageTag: 3cb6fd79-fd3a-5826-8af0-2d763f251a2a
+
+	measure 'Narrativa Canales' = ```
+			VAR Maximo = MAXX(VALUES(CanalEstado[canal_reserva]), [Confirmadas])
+			VAR Lideres = CONCATENATEX(FILTER(VALUES(CanalEstado[canal_reserva]), [Confirmadas] = Maximo), CanalEstado[canal_reserva], ", ")
+			RETURN Lideres & " lidera con " & Maximo & " confirmadas. Cancelación del grupo mostrado: " & FORMAT([Tasa Cancelacion], "0.0%") & "."
+			```
+		lineageTag: 2e173088-ac72-5cbf-9cc4-9ee048707c26
+
+	column canal_reserva
+		dataType: string
+		lineageTag: dd8b5c68-2357-5467-96ee-491b913b40a9
+		summarizeBy: none
+		sourceColumn: canal_reserva
+
+		annotation SummarizationSetBy = User
+
+	column pendientes
+		dataType: int64
+		formatString: 0
+		lineageTag: 357525fa-6a40-5d7d-a1b5-79821b073a6f
+		summarizeBy: none
+		sourceColumn: pendientes
+
+		annotation SummarizationSetBy = User
+
+	column confirmadas
+		dataType: int64
+		formatString: 0
+		lineageTag: 9cc49a31-585c-5691-b59c-fc1640b166c5
+		summarizeBy: none
+		sourceColumn: confirmadas
+
+		annotation SummarizationSetBy = User
+
+	column canceladas
+		dataType: int64
+		formatString: 0
+		lineageTag: 7bc0eb8c-37a3-5019-a9a2-0e808699376e
+		summarizeBy: none
+		sourceColumn: canceladas
+
+		annotation SummarizationSetBy = User
+
+	column posicion
+		dataType: int64
+		formatString: 0
+		lineageTag: 4db09e75-b0ad-5e4b-966d-8de98695b698
+		summarizeBy: none
+		sourceColumn: posicion
+
+		annotation SummarizationSetBy = User
+
+	partition CanalEstado = m
+		mode: import
+		source =
+				let
+				    Origen = Sql.Database(ServidorSQL, BaseDatos),
+				    Vista = Origen{[Schema="operaciones",Item="vw_reservas_por_canal_estado"]}[Data]
+				in
+				    Vista
+
+	annotation PBI_ResultType = Table
+

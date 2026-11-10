@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
+  "name": "4c83f60f980e51258eb1",
+  "position": {
+    "x": 16,
+    "y": 56,
+    "z": 200,
+    "width": 248,
+    "height": 92,
+    "tabOrder": 200
+  },
+  "visual": {
+    "visualType": "card",
+    "drillFilterOtherVisuals": true,
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "TipoHabitacion"
+                    }
+                  },
+                  "Property": "Reservas Totales"
+                }
+              },
+              "queryRef": "TipoHabitacion.Reservas Totales",
+              "nativeQueryRef": "Reservas Totales"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Reservas totales'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

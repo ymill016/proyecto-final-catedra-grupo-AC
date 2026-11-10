@@ -1,0 +1,10 @@
+expression ServidorSQL = "localhost" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: a69757b0-c1da-5051-8804-2e76d64091aa
+
+	annotation PBI_ResultType = Text
+
+expression BaseDatos = "bd_hotel_grupoAC" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: ff70107e-e4d2-5a9d-9d55-863dd7f50ca7
+
+	annotation PBI_ResultType = Text
+

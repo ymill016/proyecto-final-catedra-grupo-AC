@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
+  "name": "09ff9e2b09a750b0b162",
+  "position": {
+    "x": 266,
+    "y": 56,
+    "z": 300,
+    "width": 248,
+    "height": 92,
+    "tabOrder": 300
+  },
+  "visual": {
+    "visualType": "card",
+    "drillFilterOtherVisuals": true,
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CanalEstado"
+                    }
+                  },
+                  "Property": "Tasa Confirmacion"
+                }
+              },
+              "queryRef": "CanalEstado.Tasa Confirmacion",
+              "nativeQueryRef": "Tasa Confirmacion"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Tasa de confirmación'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

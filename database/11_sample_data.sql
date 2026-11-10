@@ -1,11 +1,5 @@
 ﻿/*
-DATOS FICTICIOS DE DEMOSTRACION - Hotel Grupo AC
-Compatible con las tablas que compartiste (SQL Server), DESPUES de crear y mover tablas a catalogo/operaciones/finanzas.
-Fechas 2025-2027; datos totalmente simulados, sin personas, documentos ni correos reales.
-No borra ni modifica registros existentes; usa IDs altos para minimizar colisiones.
-IMPORTANTE: no ejecutes el script dos veces: en la segunda ejecucion habra error por PK repetida.
-Ejecutar todo desde SSMS. Usa transaccion y XACT_ABORT para revertir si algun INSERT falla.
-*/
+DATOS FICTICIOS DE DEMOSTRACION - Hotel Grupo AC*/
 USE bd_hotel_grupoAC;
 GO
 SET NOCOUNT ON;

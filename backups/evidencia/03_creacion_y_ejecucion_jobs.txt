@@ -1,0 +1,17 @@
+-- 2026-11-10 16:53:00 :: jobs_backup.sql
+Changed database context to 'msdb'.
+Job creado: AC_Backup_FULL
+Horario configurado para AC_Backup_FULL.
+Job creado: AC_Backup_DIFF
+Horario configurado para AC_Backup_DIFF.
+Job creado: AC_Backup_LOG
+exit=0
+-- 2026-11-10 16:53:01 :: EXEC sp_start_job AC_Backup_FULL
+Job 'AC_Backup_FULL' started successfully.
+   terminado
+-- 2026-11-10 16:53:05 :: EXEC sp_start_job AC_Backup_DIFF
+Job 'AC_Backup_DIFF' started successfully.
+   terminado
+-- 2026-11-10 16:53:10 :: EXEC sp_start_job AC_Backup_LOG
+Job 'AC_Backup_LOG' started successfully.
+   terminado

@@ -1,0 +1,46 @@
+-- 2026-11-10 16:53:31 :: verificar_jobs.sql
+Changed database context to 'msdb'.
+job|estado|calendario|ultimo_resultado|fecha_yyyymmdd|hora_hhmmss|detalle
+---|------|----------|----------------|--------------|-----------|-------
+AC_Backup_DIFF|Habilitado|AC_DIFF_lunes_sabado_0200|Correcto|20261110|225307|The job succeeded.  The Job was invoked by User sa.  The last step to run was step 1 (Crear y verificar backup diferencial).
+AC_Backup_FULL|Habilitado|AC_FULL_domingo_0200|Correcto|20261110|225302|The job succeeded.  The Job was invoked by User sa.  The last step to run was step 1 (Crear y verificar backup completo).
+AC_Backup_LOG|Habilitado|AC_LOG_cada_30_min|Correcto|20261110|225310|The job succeeded.  The Job was invoked by User sa.  The last step to run was step 1 (Crear y verificar backup de log).
+
+(3 rows affected)
+-- Historial completo de cada job (paso 0 = resultado del job, paso 1 = paso T-SQL)
+job|paso|resultado|inicio|duracion_hhmmss|mensaje
+---|----|---------|------|---------------|-------
+AC_Backup_FULL|1|Correcto|2026-11-10 22:53:02|0|Executed as user: NT AUTHORITY\NETWORK SERVICE. 10 percent processed. [SQLSTATE 01000] (Message 3211)  20 percent processed. [SQLSTATE 01000] (Message 3211)  30 percent processed. [SQLSTATE 01000] (Message 3211)  40 percent proces
+AC_Backup_FULL|0|Correcto|2026-11-10 22:53:02|0|The job succeeded.  The Job was invoked by User sa.  The last step to run was step 1 (Crear y verificar backup completo).
+AC_Backup_DIFF|1|Correcto|2026-11-10 22:53:07|0|Executed as user: NT AUTHORITY\NETWORK SERVICE. 19 percent processed. [SQLSTATE 01000] (Message 3211)  38 percent processed. [SQLSTATE 01000] (Message 3211)  57 percent processed. [SQLSTATE 01000] (Message 3211)  76 percent proces
+AC_Backup_DIFF|0|Correcto|2026-11-10 22:53:07|0|The job succeeded.  The Job was invoked by User sa.  The last step to run was step 1 (Crear y verificar backup diferencial).
+AC_Backup_LOG|1|Correcto|2026-11-10 22:53:10|1|Executed as user: NT AUTHORITY\NETWORK SERVICE. 57 percent processed. [SQLSTATE 01000] (Message 3211)  100 percent processed. [SQLSTATE 01000] (Message 3211)  Processed 14 pages for database 'bd_hotel_grupoAC', file 'bd_hotel_grup
+AC_Backup_LOG|0|Correcto|2026-11-10 22:53:10|1|The job succeeded.  The Job was invoked by User sa.  The last step to run was step 1 (Crear y verificar backup de log).
+
+(6 rows affected)
+-- Horarios configurados (hora del servidor = UTC)
+job|calendario|freq_type|freq_interval|freq_subday_interval|active_start_time|active_end_time|proxima_ejecucion_utc
+---|----------|---------|-------------|--------------------|-----------------|---------------|---------------------
+AC_Backup_DIFF|AC_DIFF_lunes_sabado_0200|8|126|0|20000|235959|NULL
+AC_Backup_FULL|AC_FULL_domingo_0200|8|1|0|20000|235959|NULL
+AC_Backup_LOG|AC_LOG_cada_30_min|4|1|30|1500|234500|NULL
+
+(3 rows affected)
+-- Respaldos registrados en msdb.dbo.backupset
+tipo|name|inicio_utc|mb|checksum|archivo
+----|----|----------|--|--------|-------
+FULL|Hotel Grupo AC - Completo|2026-11-10 22:52:06|5.46|1|/var/opt/mssql/data/bd_hotel_grupoAC_FULL_20261110_225207.bak
+DIFERENCIAL|Hotel Grupo AC - Diferencial|2026-11-10 22:52:07|.96|1|/var/opt/mssql/data/bd_hotel_grupoAC_DIFF_20261110_225208.bak
+LOG|Hotel Grupo AC - Log|2026-11-10 22:52:08|.14|1|/var/opt/mssql/data/bd_hotel_grupoAC_LOG_20261110_225208.trn
+FULL|Hotel Grupo AC - Completo|2026-11-10 22:53:02|5.46|1|/var/opt/mssql/data/bd_hotel_grupoAC_FULL_20261110_225303.bak
+DIFERENCIAL|Hotel Grupo AC - Diferencial|2026-11-10 22:53:07|.52|1|/var/opt/mssql/data/bd_hotel_grupoAC_DIFF_20261110_225307.bak
+LOG|Hotel Grupo AC - Log|2026-11-10 22:53:11|.14|1|/var/opt/mssql/data/bd_hotel_grupoAC_LOG_20261110_225311.trn
+
+(6 rows affected)
+-- Archivos en disco del servidor
+-rw-rw---- 1 mssql mssql   1036288 Nov 10 22:52 bd_hotel_grupoAC_DIFF_20261110_225208.bak
+-rw-rw---- 1 mssql mssql    577536 Nov 10 22:53 bd_hotel_grupoAC_DIFF_20261110_225307.bak
+-rw-rw---- 1 mssql mssql   5754880 Nov 10 22:52 bd_hotel_grupoAC_FULL_20261110_225207.bak
+-rw-rw---- 1 mssql mssql   5754880 Nov 10 22:53 bd_hotel_grupoAC_FULL_20261110_225303.bak
+-rw-rw---- 1 mssql mssql    176128 Nov 10 22:52 bd_hotel_grupoAC_LOG_20261110_225208.trn
+-rw-rw---- 1 mssql mssql    176128 Nov 10 22:53 bd_hotel_grupoAC_LOG_20261110_225311.trn

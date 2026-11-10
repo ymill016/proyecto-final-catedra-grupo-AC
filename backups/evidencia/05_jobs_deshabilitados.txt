@@ -1,0 +1,8 @@
+-- 2026-11-10 16:53:42 :: deshabilitar jobs tras la prueba (no se borran)
+job|estado
+---|------
+AC_Backup_DIFF|Deshabilitado
+AC_Backup_FULL|Deshabilitado
+AC_Backup_LOG|Deshabilitado
+
+(3 rows affected)

@@ -1,0 +1,60 @@
+-- 2026-11-10 16:52:19 :: Paso E - restore_database.sql (rutas: /var/opt/mssql/data/bd_hotel_grupoAC_FULL_20261110_225207.bak | /var/opt/mssql/data/bd_hotel_grupoAC_DIFF_20261110_225208.bak | /var/opt/mssql/data/bd_hotel_grupoAC_LOG_20261110_225208.trn)
+Changed database context to 'master'.
+1/4 Restaurando respaldo completo...
+10 percent processed.
+20 percent processed.
+30 percent processed.
+40 percent processed.
+50 percent processed.
+60 percent processed.
+70 percent processed.
+80 percent processed.
+90 percent processed.
+100 percent processed.
+Processed 688 pages for database 'bd_hotel_grupoAC_prueba', file 'bd_hotel_grupoAC' on file 1.
+Processed 2 pages for database 'bd_hotel_grupoAC_prueba', file 'bd_hotel_grupoAC_log' on file 1.
+RESTORE DATABASE successfully processed 690 pages in 0.068 seconds (79.216 MB/sec).
+2/4 Restaurando respaldo diferencial...
+16 percent processed.
+24 percent processed.
+32 percent processed.
+40 percent processed.
+57 percent processed.
+65 percent processed.
+73 percent processed.
+81 percent processed.
+97 percent processed.
+100 percent processed.
+Processed 112 pages for database 'bd_hotel_grupoAC_prueba', file 'bd_hotel_grupoAC' on file 1.
+Processed 2 pages for database 'bd_hotel_grupoAC_prueba', file 'bd_hotel_grupoAC_log' on file 1.
+RESTORE DATABASE successfully processed 114 pages in 0.031 seconds (28.603 MB/sec).
+3/4 Restaurando respaldo de log...
+84 percent processed.
+100 percent processed.
+Processed 0 pages for database 'bd_hotel_grupoAC_prueba', file 'bd_hotel_grupoAC' on file 1.
+Processed 10 pages for database 'bd_hotel_grupoAC_prueba', file 'bd_hotel_grupoAC_log' on file 1.
+RESTORE LOG successfully processed 10 pages in 0.013 seconds (5.709 MB/sec).
+4/4 Abriendo la base de prueba...
+RESTORE DATABASE successfully processed 0 pages in 0.355 seconds (0.000 MB/sec).
+base_restaurada|state_desc|segundos_restauracion
+---------------|----------|---------------------
+bd_hotel_grupoAC_prueba|ONLINE|1
+id|etapa|fecha
+--|-----|-----
+1|Antes del Full|2026-11-10 22:52:06.5756013
+2|Antes del diferencial|2026-11-10 22:52:07.4548760
+3|Antes del log|2026-11-10 22:52:08.1440161
+exit=0
+-- Comparacion original vs restaurada
+base|demo_filas
+----|----------
+original|3
+prueba|3
+
+(2 rows affected)
+base|reservas|huespedes
+----|--------|---------
+original|111|110
+prueba|111|110
+
+(2 rows affected)

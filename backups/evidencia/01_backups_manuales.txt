@@ -1,0 +1,53 @@
+-- 2026-11-10 16:52:06 :: Paso A - tabla de demo
+Changed database context to 'bd_hotel_grupoAC'.
+
+(1 rows affected)
+-- 2026-11-10 16:52:06 :: Paso B - full_backup.sql
+Changed database context to 'master'.
+10 percent processed.
+20 percent processed.
+30 percent processed.
+40 percent processed.
+50 percent processed.
+60 percent processed.
+70 percent processed.
+80 percent processed.
+90 percent processed.
+100 percent processed.
+Processed 688 pages for database 'bd_hotel_grupoAC', file 'bd_hotel_grupoAC' on file 1.
+Processed 2 pages for database 'bd_hotel_grupoAC', file 'bd_hotel_grupoAC_log' on file 1.
+BACKUP DATABASE successfully processed 690 pages in 0.155 seconds (34.753 MB/sec).
+The backup set on file 1 is valid.
+OK - Backup FULL: /var/opt/mssql/data/bd_hotel_grupoAC_FULL_20261110_225207.bak
+exit=0
+-- 2026-11-10 16:52:07 :: Paso C - cambio + differential_backup.sql
+
+(1 rows affected)
+Changed database context to 'master'.
+16 percent processed.
+24 percent processed.
+32 percent processed.
+40 percent processed.
+57 percent processed.
+65 percent processed.
+73 percent processed.
+81 percent processed.
+97 percent processed.
+100 percent processed.
+Processed 112 pages for database 'bd_hotel_grupoAC', file 'bd_hotel_grupoAC' on file 1.
+Processed 2 pages for database 'bd_hotel_grupoAC', file 'bd_hotel_grupoAC_log' on file 1.
+BACKUP DATABASE WITH DIFFERENTIAL successfully processed 114 pages in 0.073 seconds (12.146 MB/sec).
+The backup set on file 1 is valid.
+OK - Backup DIFF: /var/opt/mssql/data/bd_hotel_grupoAC_DIFF_20261110_225208.bak
+exit=0
+-- 2026-11-10 16:52:07 :: Paso D - cambio + transaction_log_backup.sql
+
+(1 rows affected)
+Changed database context to 'master'.
+84 percent processed.
+100 percent processed.
+Processed 10 pages for database 'bd_hotel_grupoAC', file 'bd_hotel_grupoAC_log' on file 1.
+BACKUP LOG successfully processed 10 pages in 0.008 seconds (9.277 MB/sec).
+The backup set on file 1 is valid.
+OK - Backup LOG: /var/opt/mssql/data/bd_hotel_grupoAC_LOG_20261110_225208.trn
+exit=0

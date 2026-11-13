@@ -1,5 +1,5 @@
 /* ============================================================
-   AUDITORÍA PARA bd_hotel_grupoAA
+   AUDITORÍA PARA bd_hotel_grupoAC
    SQL SERVER AUDIT + DATABASE AUDIT SPECIFICATION
 ============================================================ */
 
@@ -34,6 +34,7 @@ GO
 
 /* ============================================================
    CREAR AUDITORÍA DE LA BASE DE DATOS
+   (incluye todas las tablas de operaciones y finanzas)
 ============================================================ */
 
 USE bd_hotel_grupoAA;
@@ -42,51 +43,23 @@ GO
 CREATE DATABASE AUDIT SPECIFICATION audit_hotel
 FOR SERVER AUDIT hotelAudits
 
-ADD (
-    SELECT,
-    INSERT,
-    UPDATE,
-    DELETE
-    ON dbo.huesped
-    BY PUBLIC
-),
+-- Esquema operaciones
+ADD (SELECT, INSERT, UPDATE, DELETE ON operaciones.huesped          BY PUBLIC),
+ADD (SELECT, INSERT, UPDATE, DELETE ON operaciones.empleado         BY PUBLIC),
+ADD (SELECT, INSERT, UPDATE, DELETE ON operaciones.reservacion      BY PUBLIC),
+ADD (SELECT, INSERT, UPDATE, DELETE ON operaciones.estancia         BY PUBLIC),
+ADD (SELECT, INSERT, UPDATE, DELETE ON operaciones.acompanante      BY PUBLIC),
+ADD (SELECT, INSERT, UPDATE, DELETE ON operaciones.consumo_servicio BY PUBLIC),
 
-ADD (
-    SELECT,
-    INSERT,
-    UPDATE,
-    DELETE
-    ON dbo.reservacion
-    BY PUBLIC
-),
+-- Esquema finanzas
+ADD (SELECT, INSERT, UPDATE, DELETE ON finanzas.factura             BY PUBLIC),
+ADD (SELECT, INSERT, UPDATE, DELETE ON finanzas.detalle_factura     BY PUBLIC),
 
-ADD (
-    SELECT,
-    INSERT,
-    UPDATE,
-    DELETE
-    ON dbo.estancia
-    BY PUBLIC
-),
-
-ADD (
-    SELECT,
-    INSERT,
-    UPDATE,
-    DELETE
-    ON dbo.factura
-    BY PUBLIC
-),
-
-ADD (
-    SELECT,
-    INSERT,
-    UPDATE,
-    DELETE
-    ON dbo.consumo_servicio
-    BY PUBLIC
-);
-
+-- Esquema catalogo
+ADD (SELECT, INSERT, UPDATE, DELETE ON catalogo.hotel               BY PUBLIC),
+ADD (SELECT, INSERT, UPDATE, DELETE ON catalogo.tipo_habitacion     BY PUBLIC),
+ADD (SELECT, INSERT, UPDATE, DELETE ON catalogo.habitacion          BY PUBLIC),
+ADD (SELECT, INSERT, UPDATE, DELETE ON catalogo.servicio            BY PUBLIC);
 GO
 
 /* ============================================================
@@ -136,64 +109,128 @@ GO
 
 
 /* ============================================================
-   CONSULTA GENERAL DE AUDITORÍAS
+   GENERAR ACTIVIDAD DE PRUEBA (evidencia)
+   Ejecutar este bloque y luego las consultas de más abajo.
 ============================================================ */
 
+USE bd_hotel_grupoAA;
+GO
+
+-- SELECT (action_id = 'SL')
+SELECT TOP 5 * FROM operaciones.huesped;
+SELECT TOP 5 * FROM operaciones.reservacion;
+SELECT TOP 5 * FROM finanzas.factura;
+GO
+
+-- UPDATE (action_id = 'UP'): no modifica el valor real del dato
+UPDATE operaciones.huesped
+SET nacionalidad = nacionalidad
+WHERE id_huesped = (SELECT MIN(id_huesped) FROM operaciones.huesped);
+GO
+
+-- DELETE (action_id = 'DL'): no borra filas, pero la sentencia queda auditada
+DELETE FROM operaciones.consumo_servicio
+WHERE 1 = 0;
+GO
+
+-- INSERT (action_id = 'IN'): ajusta columnas y valores a tu tabla.
+-- Ejemplo (descomenta y adapta):
+-- INSERT INTO catalogo.servicio (nombre_servicio, precio)
+-- VALUES ('Servicio de prueba auditoría', 10.00);
+-- GO
+
+-- Esperar a que SQL Server escriba los eventos en el archivo
+WAITFOR DELAY '00:00:05';
+GO
+
+
+/* ============================================================
+   CONSULTAS DE LOS LOGS (tomar captura de estos resultados)
+============================================================ */
+
+USE auditorias;
+GO
+
+-- Consulta general
 SELECT *
 FROM vw_auditoria_hotel
 ORDER BY event_time DESC;
 GO
 
-
-/* ============================================================
-   CONSULTAS ÚTILES
-============================================================ */
-
--- Ver últimas 50 acciones
+-- Últimas 50 acciones
 SELECT TOP 50 *
 FROM vw_auditoria_hotel
 ORDER BY event_time DESC;
 GO
 
--- Ver acciones realizadas sobre la tabla HUESPED
+-- Acciones sobre HUESPED
 SELECT *
 FROM vw_auditoria_hotel
-WHERE object_name = 'huesped'
+WHERE schema_name = 'operaciones'
+  AND object_name = 'huesped'
 ORDER BY event_time DESC;
 GO
 
--- Ver acciones realizadas sobre FACTURA
+-- Acciones sobre FACTURA
 SELECT *
 FROM vw_auditoria_hotel
-WHERE object_name = 'factura'
+WHERE schema_name = 'finanzas'
+  AND object_name = 'factura'
 ORDER BY event_time DESC;
 GO
 
--- Ver solo INSERTS
+-- Acciones por esquema
+SELECT *
+FROM vw_auditoria_hotel
+WHERE schema_name = 'operaciones'
+ORDER BY event_time DESC;
+GO
+
+-- Solo SELECT
+SELECT *
+FROM vw_auditoria_hotel
+WHERE action_id = 'SL'
+ORDER BY event_time DESC;
+GO
+
+-- Solo INSERTS
 SELECT *
 FROM vw_auditoria_hotel
 WHERE action_id = 'IN'
 ORDER BY event_time DESC;
 GO
 
--- Ver solo UPDATES
+-- Solo UPDATES
 SELECT *
 FROM vw_auditoria_hotel
 WHERE action_id = 'UP'
 ORDER BY event_time DESC;
 GO
 
--- Ver solo DELETES
+-- Solo DELETES
 SELECT *
 FROM vw_auditoria_hotel
 WHERE action_id = 'DL'
 ORDER BY event_time DESC;
 GO
 
--- Ver qué usuario realizó acciones
+-- Resumen: cantidad de acciones por tipo y tabla
+SELECT
+    action_id,
+    schema_name,
+    object_name,
+    COUNT(*) AS total_eventos
+FROM vw_auditoria_hotel
+WHERE schema_name IN ('operaciones', 'finanzas', 'catalogo')
+GROUP BY action_id, schema_name, object_name
+ORDER BY total_eventos DESC;
+GO
+
+-- Qué usuario realizó cada acción
 SELECT
     session_server_principal_name,
     action_id,
+    schema_name,
     object_name,
     event_time
 FROM vw_auditoria_hotel

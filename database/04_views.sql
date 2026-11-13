@@ -1,80 +1,84 @@
-/* ============================================================
-   TRES CONSULTAS (CTE, PIVOT Y FUNCIONES VENTANA)
-   SQL Server - Hotel Grupo AC
-   ============================================================ */
 USE bd_hotel_grupoAC;
 GO
 
--- Consulta 1: TIPOS DE HABITACION MAS SOLICITADOS
-CREATE OR ALTER VIEW operaciones.vw_tipos_habitacion_mas_reservados
+/*
+1. Evolución mensual de ingresos
+Objetivo: identificar cómo evolucionan los ingresos efectivamente cobrados
+por el hotel y compararlos con el período anterior.
+*/
+CREATE VIEW reportes.vw_evolucion_mensual_ingresos
 AS
-WITH ConteoHabitaciones AS (
+WITH mensual AS (
     SELECT
-        th.nombre_tipo,
-        COUNT(*) AS total_reservas
-    FROM operaciones.reservacion AS r
-    INNER JOIN catalogo.tipo_habitacion AS th
-        ON r.id_tipo_habitacion = th.id_tipo_habitacion
-    GROUP BY th.nombre_tipo
+        DATEFROMPARTS(YEAR(fecha_pago), MONTH(fecha_pago), 1) AS mes,
+        COUNT(*)   AS facturas_pagadas,
+        SUM(total) AS ingresos
+    FROM finanzas.factura
+    WHERE estado_factura = 'PAGADO'
+      AND fecha_pago IS NOT NULL
+    GROUP BY
+        YEAR(fecha_pago),
+        MONTH(fecha_pago)
 )
 SELECT
-    nombre_tipo,
-    total_reservas,
-    RANK() OVER (ORDER BY total_reservas DESC) AS posicion
-FROM ConteoHabitaciones;
+    mes,
+    facturas_pagadas,
+    ingresos,
+    LAG(ingresos) OVER (ORDER BY mes) AS ingresos_mes_anterior
+FROM mensual;
 GO
 
--- Consulta 2: RESERVACIONES POR CANAL Y ESTADO
-CREATE OR ALTER VIEW operaciones.vw_reservas_por_canal_estado
+/*
+2. Análisis de demanda y reservaciones
+Objetivo: evaluar los canales y tipos de habitación más solicitados,
+identificar cancelaciones y conocer la frecuencia con que los huéspedes
+realizan reservas.
+*/
+CREATE VIEW reportes.vw_analisis_demanda_reservaciones
 AS
 SELECT
-    p.canal_reserva,
-    ISNULL(p.[PENDIENTE], 0) AS pendientes,
-    ISNULL(p.[CONFIRMADA], 0) AS confirmadas,
-    ISNULL(p.[CANCELADA], 0) AS canceladas,
+    r.id_reservacion,
+    r.id_huesped,
+    r.fecha_reserva,
+    r.estado_reserva,
+    r.canal_reserva,
+    th.nombre_tipo,
+    h.nacionalidad,
     ROW_NUMBER() OVER (
-        ORDER BY ISNULL(p.[CONFIRMADA], 0) DESC, p.canal_reserva
-    ) AS posicion
-FROM (
-    SELECT id_reservacion, canal_reserva, estado_reserva
-    FROM operaciones.reservacion
-    WHERE canal_reserva IS NOT NULL
-) AS origen
-PIVOT (
-    COUNT(id_reservacion)
-    FOR estado_reserva IN ([PENDIENTE], [CONFIRMADA], [CANCELADA])
-) AS p;
+        PARTITION BY r.id_huesped
+        ORDER BY r.fecha_reserva, r.id_reservacion
+    ) AS numero_reserva_cliente
+FROM operaciones.reservacion r
+JOIN catalogo.tipo_habitacion th
+    ON r.id_tipo_habitacion = th.id_tipo_habitacion
+JOIN operaciones.huesped h
+    ON r.id_huesped = h.id_huesped;
 GO
 
--- Consulta 3: NACIONALIDADES CON MAS HUESPEDES
-CREATE OR ALTER VIEW operaciones.vw_huespedes_por_nacionalidad
+/*
+3. Ranking de clientes según gasto
+Objetivo: identificar los huéspedes que generan mayores ingresos cobrados,
+considerando tanto su gasto total como su frecuencia de estancias facturadas.
+*/
+CREATE VIEW reportes.vw_ranking_clientes_gasto
 AS
+WITH clientes AS (
+    SELECT
+        r.id_huesped,
+        COUNT(*)     AS estancias_pagadas,
+        SUM(f.total) AS gasto_total
+    FROM finanzas.factura f
+    JOIN operaciones.estancia e
+        ON f.id_estancia = e.id_estancia
+    JOIN operaciones.reservacion r
+        ON e.id_reservacion = r.id_reservacion
+    WHERE f.estado_factura = 'PAGADO'
+    GROUP BY r.id_huesped
+)
 SELECT
-    nacionalidad,
-    COUNT(*) AS total_huespedes,
-    DENSE_RANK() OVER (ORDER BY COUNT(*) DESC) AS posicion
-FROM operaciones.huesped
-WHERE nacionalidad IS NOT NULL
-GROUP BY nacionalidad;
+    id_huesped,
+    estancias_pagadas,
+    gasto_total,
+    RANK() OVER (ORDER BY gasto_total DESC) AS posicion
+FROM clientes;
 GO
-
--- LAS MISMAS 3 CONSULTAS PARA SSMS Y POWER BI.
-   
--- 1. CTE + RANK: tipos de habitacion
-SELECT nombre_tipo, total_reservas, posicion
-FROM operaciones.vw_tipos_habitacion_mas_reservados
-ORDER BY posicion, nombre_tipo;
-GO
-
--- 2. PIVOT + ROW_NUMBER: estados por canal
-SELECT canal_reserva, pendientes, confirmadas, canceladas, posicion
-FROM operaciones.vw_reservas_por_canal_estado
-ORDER BY posicion;
-GO
-
--- 3. DENSE_RANK: huespedes por nacionalidad
-SELECT nacionalidad, total_huespedes, posicion
-FROM operaciones.vw_huespedes_por_nacionalidad
-ORDER BY posicion, nacionalidad;
-GO
-

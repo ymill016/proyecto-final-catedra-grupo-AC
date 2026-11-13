@@ -27,13 +27,13 @@ GO
 USE bd_hotel_grupoAC;
 GO
 
-CREATE USER carlos WITH PASSWORD = 'Carlos#2026!';
-CREATE USER ana    WITH PASSWORD = 'Ana#2026!';
-CREATE USER maria  WITH PASSWORD = 'Maria#2026!';
-CREATE USER luis   WITH PASSWORD = 'Luis#2026!';
-CREATE USER sofia  WITH PASSWORD = 'Sofia#2026!';
-CREATE USER james  WITH PASSWORD = 'James#2026!';
-CREATE USER pedro  WITH PASSWORD = 'Pedro#2026!';
+CREATE USER carlos WITH PASSWORD = 'Hotel#Owner2026!';
+CREATE USER ana    WITH PASSWORD = 'Hotel#Recep2026!';
+CREATE USER maria  WITH PASSWORD = 'Hotel#Gerente2026!';
+CREATE USER luis   WITH PASSWORD = 'Hotel#Conta2026!';
+CREATE USER sofia  WITH PASSWORD = 'Hotel#Analisis2026!';
+CREATE USER james  WITH PASSWORD = 'Hotel#Profe2026!';
+CREATE USER pedro  WITH PASSWORD = 'Hotel#Backup2026!';
 GO
 
 -- Asignar cada usuario a su rol
@@ -68,7 +68,7 @@ GO
 USE master;
 GO
 
-CREATE LOGIN sandra WITH PASSWORD = 'Sandra#2026!';
+CREATE LOGIN sandra WITH PASSWORD = 'Hotel#Restore2026!';
 GO
 
 -- dbcreator permite RESTORE DATABASE

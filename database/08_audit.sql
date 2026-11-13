@@ -37,7 +37,7 @@ GO
    (incluye todas las tablas de operaciones y finanzas)
 ============================================================ */
 
-USE bd_hotel_grupoAA;
+USE bd_hotel_grupoAC;
 GO
 
 CREATE DATABASE AUDIT SPECIFICATION audit_hotel
@@ -113,7 +113,7 @@ GO
    Ejecutar este bloque y luego las consultas de más abajo.
 ============================================================ */
 
-USE bd_hotel_grupoAA;
+USE bd_hotel_grupoAC;
 GO
 
 -- SELECT (action_id = 'SL')
@@ -145,7 +145,7 @@ GO
 
 
 /* ============================================================
-   CONSULTAS DE LOS LOGS (tomar captura de estos resultados)
+   CONSULTAS DE LOS LOGS
 ============================================================ */
 
 USE auditorias;

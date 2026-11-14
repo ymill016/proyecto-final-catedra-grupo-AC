@@ -126,3 +126,47 @@ FROM operaciones.huesped AS h
 LEFT JOIN clientes AS c
     ON h.id_huesped = c.id_huesped;
 GO
+
+/* ============================================================
+   EJECUCIÓN DE LAS CONSULTAS
+   ============================================================ */
+
+-- CONSULTA 1: Evolución mensual de ingresos
+SELECT
+    mes,
+    facturas_pagadas,
+    ingresos,
+    ingresos_mes_anterior,
+    ingresos_acumulados
+FROM reportes.vw_evolucion_mensual_ingresos
+WHERE mes >= '2026-01-01'
+  AND mes < '2027-01-01'
+ORDER BY mes;
+GO
+
+-- CONSULTA 2: Demanda por tipo de habitación
+SELECT
+    mes,
+    nombre_tipo,
+    total_reservas,
+    posicion_en_el_mes,
+    porcentaje_del_mes
+FROM reportes.vw_demanda_tipos_habitacion
+WHERE mes >= '2026-01-01'
+  AND mes < '2027-01-01'
+ORDER BY mes, posicion_en_el_mes, nombre_tipo;
+GO
+
+-- CONSULTA 3: Ranking de clientes según gasto
+SELECT
+    id_huesped,
+    nombre_cliente,
+    nacionalidad,
+    estancias_pagadas,
+    gasto_total,
+    posicion
+FROM reportes.vw_ranking_clientes_gasto
+WHERE posicion <= 10
+  AND gasto_total > 0
+ORDER BY posicion, id_huesped;
+GO

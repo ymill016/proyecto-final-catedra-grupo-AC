@@ -3,6 +3,7 @@ ESQUEMAS - bd_hotel_grupoAC
 catalogo-> hotel, tipo_habitacion, habitacion, servicio
 operaciones-> huesped, empleado, reservacion, estancia, acompanante, consumo_servicio
 finanzas-> factura, detalle_factura
+reportes-> vistas de análisis (sin tablas)
 ============================================================ */
 USE bd_hotel_grupoAC;
 GO
@@ -16,6 +17,9 @@ CREATE SCHEMA operaciones AUTHORIZATION dbo;
 GO
 
 CREATE SCHEMA finanzas AUTHORIZATION dbo;
+GO
+
+CREATE SCHEMA reportes AUTHORIZATION dbo;
 GO
 
 -- mover tablas a los esquemas

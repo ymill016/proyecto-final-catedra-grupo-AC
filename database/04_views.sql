@@ -6,39 +6,32 @@ GO
 
    Objetivo:
    Analizar los ingresos efectivamente cobrados por el hotel,
-   agrupándolos por mes y reservación para identificar
-   tendencias de facturación.
+   agrupándolos por mes para identificar tendencias de
+   facturación.
    ============================================================ */
 
 CREATE OR ALTER VIEW reportes.vw_evolucion_mensual_ingresos
 AS
+WITH mensual AS (
+    SELECT
+        DATEFROMPARTS(YEAR(f.fecha_pago), MONTH(f.fecha_pago), 1) AS mes,
+        COUNT(*)     AS facturas_pagadas,
+        SUM(f.total) AS ingresos
+    FROM finanzas.factura AS f
+    INNER JOIN operaciones.estancia AS e
+        ON f.id_estancia = e.id_estancia
+    WHERE f.estado_factura = 'PAGADO'
+      AND f.fecha_pago IS NOT NULL
+    GROUP BY DATEFROMPARTS(YEAR(f.fecha_pago), MONTH(f.fecha_pago), 1)
+)
 SELECT
-    e.id_reservacion,
-
-    DATEFROMPARTS(
-        YEAR(f.fecha_pago),
-        MONTH(f.fecha_pago),
-        1
-    ) AS mes,
-
-    COUNT(*) AS facturas_pagadas,
-    SUM(f.total) AS ingresos
-
-FROM finanzas.factura AS f
-
-INNER JOIN operaciones.estancia AS e
-    ON f.id_estancia = e.id_estancia
-
-WHERE f.estado_factura = 'PAGADO'
-  AND f.fecha_pago IS NOT NULL
-
-GROUP BY
-    e.id_reservacion,
-    DATEFROMPARTS(
-        YEAR(f.fecha_pago),
-        MONTH(f.fecha_pago),
-        1
-    );
+    mes,
+    facturas_pagadas,
+    ingresos,
+    LAG(ingresos) OVER (ORDER BY mes)             AS ingresos_mes_anterior,
+    SUM(ingresos) OVER (ORDER BY mes
+                        ROWS UNBOUNDED PRECEDING) AS ingresos_acumulados
+FROM mensual;
 GO
 
 

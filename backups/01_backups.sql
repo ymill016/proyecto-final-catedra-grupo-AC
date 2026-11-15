@@ -1,52 +1,44 @@
-/* ===============================================================
-   HOTEL GRUPO AC - RESPALDOS INICIALES (PRIMERA INSTALACION)
-   Ejecutar UNA SOLA VEZ y en el orden indicado, como sysadmin.
-   Requiere: carpeta /backup/HotelGrupoAC creada en Docker.
-   Rutas del SERVIDOR Linux, no rutas de Windows.
-   ADVERTENCIA: INIT reemplaza el contenido de un archivo del mismo nombre.
-   NO repetir si esos archivos ya se estan usando para restauracion.
-   =============================================================== */
-USE master;
+/* =====================================================
+   HOTEL GRUPO AC - RESPALDOS MANUALES
+
+   Usuario: login_jobs_hotel
+   Rol: db_backupoperator
+
+   Requisitos:
+   - Base de datos en modelo FULL.
+   - Carpeta /backup/HotelGrupoAC existente.
+   - Permisos de escritura en el servidor.
+
+   Respaldos:
+   1. Completo
+   2. Diferencial
+   3. Log de transacciones
+   ===================================================== */
+
+USE bd_hotel_grupoAC;
 GO
 
--- Modelo FULL: permite generar respaldos del log.
-ALTER DATABASE bd_hotel_grupoAC SET RECOVERY FULL;
+-- Verificar usuario y permisos
+SELECT
+    SUSER_SNAME() AS login_actual,
+    USER_NAME() AS usuario_base,
+    IS_MEMBER('db_backupoperator') AS autorizado_backup;
 GO
 
--- 1. BACKUP COMPLETO (base para los diferenciales y cadena de log).
+-- 1. RESPALDO COMPLETO
 BACKUP DATABASE bd_hotel_grupoAC
 TO DISK = '/backup/HotelGrupoAC/hotel_full.bak'
-WITH INIT, CHECKSUM, COMPRESSION, STATS = 10,
-     NAME = N'Backup Completo Inicial Hotel Grupo AC';
-GO
-RESTORE VERIFYONLY
-FROM DISK = '/backup/HotelGrupoAC/hotel_full.bak'
-WITH CHECKSUM;
+WITH CHECKSUM, COMPRESSION, STATS = 10;
 GO
 
--- 2. BACKUP DIFERENCIAL (cambios desde el FULL base).
+-- 2. RESPALDO DIFERENCIAL
 BACKUP DATABASE bd_hotel_grupoAC
 TO DISK = '/backup/HotelGrupoAC/hotel_diff.bak'
-WITH DIFFERENTIAL, INIT, CHECKSUM, COMPRESSION, STATS = 10,
-     NAME = N'Backup Diferencial Inicial Hotel Grupo AC';
-GO
-RESTORE VERIFYONLY
-FROM DISK = '/backup/HotelGrupoAC/hotel_diff.bak'
-WITH CHECKSUM;
+WITH DIFFERENTIAL, CHECKSUM, COMPRESSION, STATS = 10;
 GO
 
--- 3. BACKUP DEL LOG (registros del log desde el respaldo anterior).
+-- 3. RESPALDO DEL LOG
 BACKUP LOG bd_hotel_grupoAC
 TO DISK = '/backup/HotelGrupoAC/hotel_log.trn'
-WITH INIT, CHECKSUM, COMPRESSION, STATS = 10,
-     NAME = N'Backup Log Inicial Hotel Grupo AC';
-GO
-RESTORE VERIFYONLY
-FROM DISK = '/backup/HotelGrupoAC/hotel_log.trn'
-WITH CHECKSUM;
-GO
-
-RESTORE VERIFYONLY FROM DISK = @archivo WITH CHECKSUM;
-
-SELECT @archivo AS archivo_respaldo;
+WITH CHECKSUM, COMPRESSION, STATS = 10;
 GO

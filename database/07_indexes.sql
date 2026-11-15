@@ -5,27 +5,50 @@ go
                 --- 7. INDICES ---
 -----------------------------------------------------------
 
--- Para vw_tipos_habitacion_mas_reservados: Acelera el conteo de reservas por cada tipo de habitación
--- Evita el Sort antes del agregado 
-CREATE NONCLUSTERED INDEX ix_reservacion_tipo_habitacion 
-ON operaciones.reservacion (id_tipo_habitacion);
+-- Estadística para estimar filas en el JOIN entre estancia y reservación
+CREATE STATISTICS st_estancia_id_reservacion
+ON operaciones.estancia (id_reservacion);
 
--- Para vw_reservas_por_canal_estado: Agrupa por canal de reserva y cuenta por estado de reserva.
--- excluye registros donde canal_reserva es nulo.
-CREATE NONCLUSTERED INDEX ix_reservacion_canal_estado
-ON operaciones.reservacion (canal_reserva)
-INCLUDE (estado_reserva)
-WHERE canal_reserva IS NOT NULL;
+-- Estadística para filtros por estado y fecha de pago
+CREATE STATISTICS st_factura_estado_fecha
+ON finanzas.factura (estado_factura, fecha_pago);
 
--- Para vw_huespedes_por_nacionalidad: agrupa huéspedes por nacionalidad.
--- excluye registros donde nacionalidad es nula.
-CREATE NONCLUSTERED INDEX ix_huesped_nacionalidad
-ON operaciones.huesped (nacionalidad)
-WHERE nacionalidad IS NOT NULL;
+--recalcular la estadisticas 
+UPDATE STATISTICS operaciones.estancia WITH FULLSCAN;
+UPDATE STATISTICS finanzas.factura WITH FULLSCAN;
+
+-- Índice filtrado solo por facturas pagadas; cubre fecha_pago y total sin Key Lookup
+CREATE NONCLUSTERED INDEX IX_factura_fecha_estancia
+ON finanzas.factura (id_estancia)
+INCLUDE (fecha_pago, total)
+WHERE estado_factura = 'PAGADO' AND fecha_pago IS NOT NULL;
+GO
+
+-- Búsqueda por huésped y fecha; INCLUDE evita lecturas a la tabla base
+CREATE NONCLUSTERED INDEX IX_reservacion_huesped_fecha
+ON operaciones.reservacion (id_huesped, fecha_reserva, id_reservacion)
+INCLUDE (estado_reserva, canal_reserva, id_tipo_habitacion);
+
+-- Índice filtrado: solo las facturas pagadas, ya agrupables por estancia
+CREATE NONCLUSTERED INDEX IX_factura_pagado_estancia
+ON finanzas.factura (id_estancia)
+INCLUDE (total)
+WHERE estado_factura = 'PAGADO';
+
+-- Cubre los datos del huésped que muestra el reporte
+CREATE NONCLUSTERED INDEX IX_huesped_reporte
+ON operaciones.huesped (id_huesped)
+INCLUDE (nombre, apellido, nacionalidad);
+
+-- Para el JOIN entre reservación y huésped
+CREATE NONCLUSTERED INDEX IX_reservacion_huesped
+ON operaciones.reservacion (id_reservacion)
+INCLUDE (id_huesped);
 
 --Consultar indices por tablas
 EXEC sp_helpindex 'operaciones.reservacion';
 EXEC sp_helpindex 'operaciones.huesped';
+EXEC sp_helpindex 'finanzas.factura';
 
 --Consultar todos los indices existentes en la base de datos
 SELECT
